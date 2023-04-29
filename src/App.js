@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import Select from "react-select";
 import standard from "./data/standard";
 import subjects from "./data/subjects";
 import chapters from "./data/chapters";
-import topics from "./data/topics";
 
 export default function App() {
+  const history = useHistory();
+
   const [selectedStandard, setSelectedStandard] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(null);
@@ -27,15 +29,10 @@ export default function App() {
       label: chapter.name,
       isDisabled: !selectedSubject,
     }));
-
-  // Filter topics based on selected chapter
-  const topicOptions = topics
-    .filter((topic) => topic.chapterId === selectedChapter?.value)
-    .map((topic) => ({
-      value: topic.id,
-      label: topic.name,
-      isDisabled: !selectedChapter,
-    }));
+  const handleChapterSelect = (selectedOption) => {
+    setSelectedChapter(selectedOption);
+    history.push("/topics/" + selectedOption.value);
+  };
 
   return (
     <>
@@ -61,15 +58,8 @@ export default function App() {
           options={chapterOptions}
           placeholder="Select Chapter"
           value={selectedChapter}
-          onChange={setSelectedChapter}
+          onChange={handleChapterSelect}
           isDisabled={!selectedSubject}
-        />
-      </div>
-      <div style={{ margin: 20, width: 500 }}>
-        <Select
-          options={topicOptions}
-          placeholder="Select Topic"
-          isDisabled={!selectedChapter}
         />
       </div>
     </>
