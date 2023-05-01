@@ -100,7 +100,7 @@ const App = () => {
                     <Button onClick={() => handleDeleteChapter(chapter)}>
                       Delete
                     </Button>
-                    <Link to={`/topics/${chapter}`}>View Topics</Link>
+                    <Link to={`/topics/${chapter}`}>Go For Topics</Link>
                   </Td>
                 </Tr>
               ))}
