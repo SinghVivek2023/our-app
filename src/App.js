@@ -1,67 +1,116 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import Select from "react-select";
-import standard from "./data/standard";
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Button,
+  Input,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+} from "@chakra-ui/react";
+import { Link, Route } from "react-router-dom";
+import standards from "./data/standard";
 import subjects from "./data/subjects";
-import chapters from "./data/chapters";
+import initialChapters from "./data/chapters";
+import Topics from "./Topics";
 
-export default function App() {
-  const history = useHistory();
+const App = () => {
+  const [selectedStandard, setSelectedStandard] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [chapters, setChapters] = useState(initialChapters);
+  const [newChapter, setNewChapter] = useState("");
 
-  const [selectedStandard, setSelectedStandard] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [selectedChapter, setSelectedChapter] = useState(null);
+  const handleAddChapter = () => {
+    if (newChapter !== "") {
+      setChapters({
+        ...chapters,
+        [selectedSubject]: [...chapters[selectedSubject], newChapter],
+      });
+      setNewChapter("");
+    }
+  };
 
-  // Filter subjects based on selected standard
-  const subjectOptions = subjects
-    .filter((subject) => subject.standardId === selectedStandard?.value)
-    .map((subject) => ({
-      value: subject.id,
-      label: subject.name,
-      isDisabled: !selectedStandard,
-    }));
-
-  // Filter chapters based on selected subject
-  const chapterOptions = chapters
-    .filter((chapter) => chapter.subjectId === selectedSubject?.value)
-    .map((chapter) => ({
-      value: chapter.id,
-      label: chapter.name,
-      isDisabled: !selectedSubject,
-    }));
-  const handleChapterSelect = (selectedOption) => {
-    setSelectedChapter(selectedOption);
-    history.push("/topics/" + selectedOption.value);
+  const handleDeleteChapter = (chapter) => {
+    const updatedChapters = chapters[selectedSubject].filter(
+      (c) => c !== chapter
+    );
+    setChapters({
+      ...chapters,
+      [selectedSubject]: updatedChapters,
+    });
   };
 
   return (
-    <>
-      <div style={{ margin: 20, width: 500 }}>
+    <Box>
+      <FormControl p={4}>
+        <FormLabel>Select standards</FormLabel>
         <Select
-          options={standard}
+          value={{ label: selectedStandard, value: selectedStandard }}
+          options={standards.map((standard) => ({
+            label: standard,
+            value: standard,
+          }))}
+          onChange={(selectedOption) =>
+            setSelectedStandard(selectedOption.value)
+          }
           placeholder="Select Standard"
-          value={selectedStandard}
-          onChange={setSelectedStandard}
         />
-      </div>
-      <div style={{ margin: 20, width: 500 }}>
-        <Select
-          options={subjectOptions}
-          placeholder="Select Subject"
-          value={selectedSubject}
-          onChange={setSelectedSubject}
-          isDisabled={!selectedStandard}
-        />
-      </div>
-      <div style={{ margin: 20, width: 500 }}>
-        <Select
-          options={chapterOptions}
-          placeholder="Select Chapter"
-          value={selectedChapter}
-          onChange={handleChapterSelect}
-          isDisabled={!selectedSubject}
-        />
-      </div>
-    </>
+      </FormControl>
+      {selectedStandard && (
+        <FormControl p={4}>
+          <FormLabel>Select subject</FormLabel>
+          <Select
+            value={{ label: selectedSubject, value: selectedSubject }}
+            options={subjects[selectedStandard].map((subject) => ({
+              label: subject,
+              value: subject,
+            }))}
+            onChange={(selectedOption) =>
+              setSelectedSubject(selectedOption.value)
+            }
+            placeholder="Select Subject"
+          />
+        </FormControl>
+      )}
+      {selectedSubject && (
+        <Box mt={4}>
+          <Input
+            placeholder="New Chapter"
+            value={newChapter}
+            onChange={(e) => setNewChapter(e.target.value)}
+          />
+          <Button onClick={handleAddChapter}>Add Chapter</Button>
+          <Table mt={4}>
+            <Thead>
+              <Tr>
+                <Th>Chapter Name</Th>
+                <Th>Action</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {chapters[selectedSubject].map((chapter) => (
+                <Tr key={chapter}>
+                  <Td>{chapter}</Td>
+                  <Td>
+                    <Button onClick={() => handleDeleteChapter(chapter)}>
+                      Delete
+                    </Button>
+                    <Link to={`/topics/${chapter}`}>View Topics</Link>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
+      )}
+      <Route path="/topics/:chapter" component={Topics} />
+    </Box>
   );
-}
+};
+
+export default App;
