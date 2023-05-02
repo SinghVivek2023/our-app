@@ -46,43 +46,80 @@ const App = () => {
     });
   };
 
+  const StandardSelect = ({ value, onChange }) => (
+    <FormControl p={4}>
+      <FormLabel fontSize="xl" fontWeight="bold">
+        Select standards
+      </FormLabel>
+      <Select
+        value={{ label: value, value }}
+        options={standards.map((standard) => ({
+          label: standard,
+          value: standard,
+        }))}
+        onChange={(selectedOption) => onChange(selectedOption.value)}
+        placeholder="Select Standards"
+        size="lg"
+      />
+    </FormControl>
+  );
+
+  const SubjectSelect = ({ value, onChange }) => (
+    <FormControl p={4}>
+      <FormLabel fontSize="xl" fontWeight="bold">
+        Select subjects
+      </FormLabel>
+      <Select
+        value={{ label: value, value }}
+        options={subjects[selectedStandard].map((subject) => ({
+          label: subject,
+          value: subject,
+        }))}
+        onChange={(selectedOption) => onChange(selectedOption.value)}
+        placeholder="Select Subjects"
+        size="lg"
+      />
+    </FormControl>
+  );
+
+  const ChapterTable = () => (
+    <Table variant="simple" mt={4}>
+      <Thead>
+        <Tr>
+          <Th>Chapter Name</Th>
+          <Th>Action</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {chapters[selectedSubject].map((chapter) => (
+          <Tr key={chapter}>
+            <Td>{chapter}</Td>
+            <Td>
+              <Button
+                onClick={() => handleDeleteChapter(chapter)}
+                colorScheme="red"
+                mr={2}
+              >
+                Delete
+              </Button>
+              <Link
+                to={`/topics/${chapter}`}
+                state={{ topics: topics[chapter] }}
+              >
+                Go For Topics
+              </Link>
+            </Td>
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
+  );
+
   return (
     <Box>
-      <FormControl p={4}>
-        <FormLabel fontSize="xl" fontWeight="bold">
-          Select Standards
-        </FormLabel>
-        <Select
-          value={{ label: selectedStandard, value: selectedStandard }}
-          options={standards.map((standard) => ({
-            label: standard,
-            value: standard,
-          }))}
-          onChange={(selectedOption) =>
-            setSelectedStandard(selectedOption.value)
-          }
-          placeholder="Select Standards"
-          size="lg"
-        />
-      </FormControl>
+      <StandardSelect value={selectedStandard} onChange={setSelectedStandard} />
       {selectedStandard && (
-        <FormControl p={4}>
-          <FormLabel fontSize="xl" fontWeight="bold">
-            Select Subjects
-          </FormLabel>
-          <Select
-            value={{ label: selectedSubject, value: selectedSubject }}
-            options={subjects[selectedStandard].map((subject) => ({
-              label: subject,
-              value: subject,
-            }))}
-            onChange={(selectedOption) =>
-              setSelectedSubject(selectedOption.value)
-            }
-            placeholder="Select Subjects"
-            size="lg"
-          />
-        </FormControl>
+        <SubjectSelect value={selectedSubject} onChange={setSelectedSubject} />
       )}
       {selectedSubject && (
         <Box mt={4}>
@@ -96,36 +133,7 @@ const App = () => {
           <Button onClick={handleAddChapter} colorScheme="blue" size="lg">
             Add Chapter
           </Button>
-          <Table variant="simple" mt={4}>
-            <Thead>
-              <Tr>
-                <Th>Chapter Name</Th>
-                <Th>Action</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {chapters[selectedSubject].map((chapter) => (
-                <Tr key={chapter}>
-                  <Td>{chapter}</Td>
-                  <Td>
-                    <Button
-                      onClick={() => handleDeleteChapter(chapter)}
-                      colorScheme="red"
-                      mr={2}
-                    >
-                      Delete
-                    </Button>
-                    <Link
-                      to={`/topics/${chapter}`}
-                      state={{ topics: topics[chapter] }}
-                    >
-                      Go For Topics
-                    </Link>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
+          <ChapterTable />
         </Box>
       )}
       <Routes>
