@@ -50,7 +50,7 @@ const App = () => {
     <Box>
       <FormControl p={4}>
         <FormLabel fontSize="xl" fontWeight="bold">
-          Select standards
+          Select Standards
         </FormLabel>
         <Select
           value={{ label: selectedStandard, value: selectedStandard }}
@@ -68,7 +68,7 @@ const App = () => {
       {selectedStandard && (
         <FormControl p={4}>
           <FormLabel fontSize="xl" fontWeight="bold">
-            Select subjects
+            Select Subjects
           </FormLabel>
           <Select
             value={{ label: selectedSubject, value: selectedSubject }}
