@@ -9,13 +9,16 @@ import {
   Tr,
   Th,
   Td,
+  Select,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
+import topicsData from "./data/topics";
 
-const Topics = () => {
+const Topics = ({ location }) => {
   const { chapter } = useParams();
-  const [topics, setTopics] = useState([]);
+  const [topics, setTopics] = useState(topicsData[chapter] || []);
   const [newTopic, setNewTopic] = useState("");
+  const [topicFilter, setTopicFilter] = useState("");
 
   const handleAddTopic = () => {
     if (newTopic !== "") {
@@ -30,16 +33,52 @@ const Topics = () => {
     setTopics(updatedTopics);
   };
 
+  const handleFilterChange = (e) => {
+    setTopicFilter(e.target.value);
+  };
+
+  const filteredTopics = topics.filter((topic) =>
+    topic.toLowerCase().includes(topicFilter.toLowerCase())
+  );
+
   return (
     <Box>
-      <h1>Topics for {chapter}</h1>
+      <h1
+        style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem" }}
+      >
+        Topics for {chapter}
+      </h1>
       <Input
         placeholder="New Topic"
         value={newTopic}
         onChange={(e) => setNewTopic(e.target.value)}
+        size="lg"
+        marginBottom="1rem"
       />
-      <Button onClick={handleAddTopic}>Add Topic</Button>
-      <Table mt={4}>
+      <Button
+        onClick={handleAddTopic}
+        colorScheme="blue"
+        size="lg"
+        marginBottom="1rem"
+      >
+        Add Topic
+      </Button>
+      <Select
+        value={topicFilter}
+        onChange={handleFilterChange}
+        size="lg"
+        marginBottom="1rem"
+      >
+        <option value="" disabled>
+          All Topics
+        </option>
+        {topics.map((topic, index) => (
+          <option key={index} value={topic}>
+            {topic}
+          </option>
+        ))}
+      </Select>
+      <Table variant="simple" marginTop="2rem">
         <Thead>
           <Tr>
             <Th>Topic Name</Th>
@@ -47,11 +86,17 @@ const Topics = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {topics.map((topic, index) => (
+          {filteredTopics.map((topic, index) => (
             <Tr key={index}>
               <Td>{topic}</Td>
               <Td>
-                <Button onClick={() => handleDeleteTopic(index)}>Delete</Button>
+                <Button
+                  onClick={() => handleDeleteTopic(index)}
+                  colorScheme="red"
+                  size="sm"
+                >
+                  Delete
+                </Button>
               </Td>
             </Tr>
           ))}
